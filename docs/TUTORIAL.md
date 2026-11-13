@@ -2,7 +2,9 @@
 
 This walkthrough takes about five minutes. It uses a sample project and a short list of guiding questions to show you how to explore any codebase with Pixel.
 
-The same tour is built into the site: on the home page, press **Start the tour**. This page is the written version, for teachers and for anyone who wants to read ahead.
+The same tour is built into the site and runs by itself. The first time someone opens the site in a browser, they are taken straight to it. They press **Begin the tour** once, and Pixel then walks through every step: it asks each guiding question, puts the right file in the Code window, opens the right panel, and moves on when it has finished talking. A red banner across the top of the page shows the current step, with Pause, Back, Next and Skip buttons. The student can interrupt with their own question at any time.
+
+To run it again later, press **Start the tour** on the home page. This page is the written version, for teachers and for anyone who wants to read ahead.
 
 ## The sample project
 
@@ -19,7 +21,8 @@ The sample is this project's own code: `https://github.com/Lville-Innovation/cod
 | Area | Where | What it is for |
 | --- | --- | --- |
 | Pixel | Top left | The fox you talk to. The label underneath says whether Pixel is listening, thinking, or talking. |
-| Guided tour | Below Pixel | The steps of this tutorial. After the tour it becomes a list of questions to try. |
+| Guided tour | Red banner across the top | The current step of this tutorial, what to notice, and the tour controls. |
+| Try asking | Below Pixel | Questions you can tap at any time. |
 | Code window | Middle | A file list on the left, and the file Pixel is showing on the right, with the important lines highlighted. |
 | Conversation | Below the code | Everything you and Pixel have said, plus a box for typing. |
 | Words to know, About, People | Right | New words explained, a summary of the project, and who works on it. |
@@ -83,4 +86,4 @@ Go back to the home page and paste a link to any public GitHub or gitlab.com pro
 
 ## For teachers: changing the sample
 
-The sample project and the steps live in `web/lib/tutorial.ts`. Change `TUTORIAL_REPO` to use a different project, and edit the questions so they match what that project contains.
+The sample project and the steps live in `web/lib/tutorial.ts`. Change `TUTORIAL_REPO` to use a different project, and edit the questions so they match what that project contains. Each step can also name the file Pixel should show (`direct`) and the side panel to open (`tab`).

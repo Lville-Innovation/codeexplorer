@@ -24,7 +24,7 @@ const CODE_TOPIC = "repo-buddy.code";
 
 type Phase = "idle" | "connecting" | "live" | "ended";
 type SideTab = "words" | "about" | "people";
-type Ask = (q: string) => void;
+type Ask = (q: string, hidden?: string) => void;
 interface Concept {
   term: string;
   explanation: string;
@@ -45,6 +45,20 @@ interface CodeView {
   endLine: number | null;
   caption: string;
   url: string;
+}
+
+/**
+ * When each spoken line first reached this browser, by stream id. Lines are ordered by this
+ * instead of the sender's timestamp, because the two computers' clocks can disagree.
+ */
+const arrivedAt = new Map<string, number>();
+function arrival(id: string): number {
+  let at = arrivedAt.get(id);
+  if (at === undefined) {
+    at = Date.now();
+    arrivedAt.set(id, at);
+  }
+  return at;
 }
 
 export default function Talk() {
@@ -149,7 +163,7 @@ function Session({
   const [tab, setTab] = useState<SideTab>("words");
   const [updateNote, setUpdateNote] = useState<Record<string, string>>({});
   const [checking, setChecking] = useState<string | null>(null);
-  const pending = useRef<string | null>(null);
+  const pending = useRef<{ q: string; hidden?: string } | null>(null);
   const logRef = useRef<HTMLDivElement>(null);
   const tabRef = useRef<SideTab>("words");
   tabRef.current = tab;
@@ -192,12 +206,13 @@ function Session({
   }, [room]);
 
   const send = useCallback(
-    async (text: string) => {
+    async (text: string, hidden = "") => {
       const clean = text.trim();
       if (!clean) return;
       setTyped((prev) => [...prev, { id: crypto.randomUUID(), text: clean, at: Date.now() }]);
       try {
-        await room.localParticipant.sendText(clean, { topic: "lk.chat" });
+        // `hidden` carries guided-tour directions for Pixel that the student does not need to read.
+        await room.localParticipant.sendText(clean + hidden, { topic: "lk.chat" });
       } catch {
         setError("That message didn't go through. Try again.");
       }
@@ -249,16 +264,16 @@ function Session({
   // A question tapped before the session started is asked once Pixel is listening.
   useEffect(() => {
     if (agentReady && state === "listening" && pending.current) {
-      const q = pending.current;
+      const { q, hidden } = pending.current;
       pending.current = null;
-      void send(q);
+      void send(q, hidden);
     }
   }, [agentReady, state, send]);
 
-  const ask: Ask = (q) => {
-    if (phase === "live" && agentReady) void send(q);
+  const ask: Ask = (q, hidden) => {
+    if (phase === "live" && agentReady) void send(q, hidden);
     else {
-      pending.current = q;
+      pending.current = { q, hidden };
       if (phase === "idle" || phase === "ended") void connect();
     }
   };
@@ -307,7 +322,7 @@ function Session({
       .map((t) => ({
         id: t.streamInfo.id,
         text: t.text,
-        at: t.streamInfo.timestamp,
+        at: arrival(t.streamInfo.id),
         mine: t.participantInfo.identity === me,
       }));
     const written = typed.map((t) => ({ ...t, mine: true }));
@@ -337,7 +352,19 @@ function Session({
   };
 
   return (
-    <main className="desk">
+    <main className={`desk ${touring ? "touring" : ""}`}>
+      {touring && (
+          <Tour
+            ask={ask}
+            start={() => void connect()}
+            inSession={phase === "connecting" || phase === "live"}
+            agentReady={agentReady}
+            agentState={state}
+            currentFile={view?.path ?? null}
+            openTab={pickTab}
+            onExit={() => setTouring(false)}
+          />
+      )}
       {/* ---------- Pixel ---------- */}
       <aside className="desk-col col-pixel">
         <section className="tile pixel-tile">
@@ -381,9 +408,6 @@ function Session({
           {error && <p className="form-error small" role="alert">{error}</p>}
         </section>
 
-        {touring ? (
-          <Tour ask={ask} start={() => void connect()} inSession={phase === "connecting" || phase === "live"} onExit={() => setTouring(false)} />
-        ) : (
         <section className="tile grow">
           <h2 className="tile-title">Try asking</h2>
           <div className="tile-body chips-col">
@@ -392,10 +416,9 @@ function Session({
             ))}
             <button className="chip q" onClick={() => ask("Who are the most active contributors, and how active is this project?")}>Who is most active here?</button>
             <button className="chip q" onClick={() => ask("What changed most recently in this project?")}>What changed recently?</button>
-            {tour && <button className="link-btn tour-again" onClick={() => setTouring(true)}>Back to the guided tour</button>}
+            {tour && !touring && <button className="link-btn tour-again" onClick={() => setTouring(true)}>Back to the guided tour</button>}
           </div>
         </section>
-        )}
       </aside>
 
       {/* ---------- Code + conversation ---------- */}

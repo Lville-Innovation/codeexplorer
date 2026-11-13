@@ -4,6 +4,8 @@
 /** The sample project is this tool's own code, so students explore the thing they are using. */
 export const TUTORIAL_REPO = "Lville-Innovation/codeexplorer";
 export const TUTORIAL_HREF = `/talk?repos=${encodeURIComponent(TUTORIAL_REPO)}&tour=1`;
+/** Browser storage key that records the tour has been offered once. */
+export const TOUR_SEEN_KEY = "code-explorer-tour-seen";
 
 export type TourAction =
   | { kind: "start" }
@@ -19,6 +21,20 @@ export interface TourStep {
   action: TourAction;
   /** What to look at on screen while Pixel answers. */
   notice: string;
+  /**
+   * Extra directions sent to Pixel with the question but not shown to the student.
+   * They make sure the right thing is on screen while Pixel talks.
+   */
+  direct?: string;
+  /** Side panel tab to open when the step begins. */
+  tab?: "words" | "about" | "people";
+  /** The file that should be in the Code window by the end of the step. */
+  file?: string;
+}
+
+/** Wraps a step's hidden directions so Pixel keeps the tour short and moving. */
+export function tourNote(stepNumber: number, direct?: string): string {
+  return ` (Guided tour, step ${stepNumber} of ${TOUR_STEPS.length}, for a first-time visitor. Answer in at most four short sentences. ${direct ?? ""} Do not end with a question; the tour moves to the next step by itself.)`;
 }
 
 export const TOUR_STEPS: TourStep[] = [
@@ -33,24 +49,32 @@ export const TOUR_STEPS: TourStep[] = [
     goal: "Before reading any code, find out what the project is for. The sample project is the code behind this very website.",
     action: { kind: "ask", label: "What does this project do?", question: "What does this project do, in simple words?" },
     notice: "Everything you and Pixel say appears under Conversation. New words Pixel explains show up as cards under Words to know, on the right.",
+    direct: "Call show_concept for the word repository so a card appears, and mention that new words land in the Words to know panel on the right. Do not call show_code yet.",
+    tab: "words",
   },
   {
     title: "Read the welcome page",
     goal: "Almost every project has a file called README. It is the welcome page, and it is the best place to start in any codebase.",
     action: { kind: "ask", label: "Show me the README", question: "Show me the README and tell me what it says." },
     notice: "The file opens in the Code window in the middle of the screen. The lines Pixel is talking about are highlighted, with a short note above them.",
+    direct: "Before you speak, call show_code on README.md and highlight the opening lines that say what the project is. Then tell them to look at the highlighted lines in the Code window.",
+    file: "README.md",
   },
   {
     title: "Tour the folders",
     goal: "Folder names are like labels on drawers. They tell you where each kind of thing lives.",
     action: { kind: "ask", label: "Tour the folders", question: "Give me a tour of the folders and what each one is for." },
     notice: "The file list sits on the left side of the Code window. This project has two main folders: one for the website and one for Pixel.",
+    direct: "Before you speak, call show_code on README.md and highlight the table that lists the web and agent folders. Point them to the file list on the left side of the Code window.",
+    file: "README.md",
   },
   {
     title: "Follow one feature",
     goal: "The best way to learn a codebase is to pick one thing it does and find the code behind it. Find out where Pixel gets its personality.",
     action: { kind: "ask", label: "Where is Pixel's personality written?", question: "Where in the code is Pixel's personality and way of talking written? Show me that code." },
     notice: "Listen for how Pixel found it, such as searching for a word. The link at the top right of the Code window opens the same lines on GitHub.",
+    direct: "Search the code to find it, say how you found it, and before you explain it call show_code on agent/src/knowledge.ts highlighting the lines of the instructions that describe how to talk.",
+    file: "agent/src/knowledge.ts",
   },
   {
     title: "Open a file yourself",
@@ -62,12 +86,16 @@ export const TOUR_STEPS: TourStep[] = [
       question: "Show me the file web/lib/parse.ts and explain what it does.",
     },
     notice: "Tapping any file asks Pixel to show it and explain its job. You never have to understand every line; ask about the part that looks interesting.",
+    direct: "Before you speak, call show_code on web/lib/parse.ts and highlight one small function.",
+    file: "web/lib/parse.ts",
   },
   {
     title: "Meet the people",
     goal: "Code is written by people, one saved change at a time. Each saved change is called a commit.",
     action: { kind: "ask", label: "Who works on this?", question: "Who has worked on this project, and what changed most recently?" },
-    notice: "Open the People tab on the right to see how active the project is and who has made the most changes.",
+    notice: "The People tab on the right shows how active the project is and who has made the most changes.",
+    direct: "The People tab has just opened on the right of their screen; point to it. Do not call show_code for this answer.",
+    tab: "people",
   },
   {
     title: "Your turn",

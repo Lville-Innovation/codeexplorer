@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { learn, timeAgo } from "@/lib/client";
 import { parseRepoLoose, repoIdOf } from "@/lib/parse";
-import { TUTORIAL_HREF } from "@/lib/tutorial";
+import { TOUR_SEEN_KEY, TUTORIAL_HREF } from "@/lib/tutorial";
 import { MAX_REPOS, type RecentRepo } from "@/lib/types";
 
 const EXAMPLES = ["pallets/flask", "expressjs/express", "psf/requests"];
@@ -30,6 +30,17 @@ export default function Home() {
       .then((d: { repos?: RecentRepo[] }) => setRecent(d.repos ?? []))
       .catch(() => {});
   }, []);
+
+  // A first-time visitor is taken straight into the guided tour, once per browser.
+  useEffect(() => {
+    try {
+      if (localStorage.getItem(TOUR_SEEN_KEY)) return;
+      localStorage.setItem(TOUR_SEEN_KEY, "1");
+      router.replace(TUTORIAL_HREF);
+    } catch {
+      // Storage is blocked; the tour card on the page still works.
+    }
+  }, [router]);
 
   const setLink = (i: number, v: string) => setLinks((prev) => prev.map((x, j) => (j === i ? v : x)));
   const busy = jobs !== null && jobs.some((j) => j.status === "waiting" || j.status === "working");
@@ -129,7 +140,7 @@ export default function Home() {
 
           <div className="card tour-card">
             <div>
-              <strong>First time here?</strong> Take the 5-minute guided tour with a sample project.
+              <strong>First time here?</strong> Pixel will walk you through a sample project in about five minutes.
             </div>
             <a className="btn" href={TUTORIAL_HREF}>Start the tour</a>
           </div>
