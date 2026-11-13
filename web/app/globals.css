@@ -212,3 +212,6 @@ code { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-siz
 .commits li { display: grid; grid-template-columns: 96px 1fr; gap: 10px; font-size: 0.93rem; overflow-wrap: anywhere; }
 .commit-date { color: var(--ink-soft); font-size: 0.85rem; }
 @media (max-width: 520px) { .commits li { grid-template-columns: 1fr; gap: 0; } }
+
+/* first-time tour invitation on the home page */
+.tour-card { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; border-color: var(--red); }

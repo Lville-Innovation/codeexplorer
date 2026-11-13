@@ -16,6 +16,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { learn, timeAgo } from "@/lib/client";
 import { hostName, parseRepoLoose, repoIdOf } from "@/lib/parse";
 import { MAX_REPOS, type Knowledge } from "@/lib/types";
+import Tour from "./Tour";
 import "./desk.css";
 
 const CONCEPT_TOPIC = "repo-buddy.concept";
@@ -53,6 +54,7 @@ export default function Talk() {
     const parsed = raw.map((r) => parseRepoLoose(r)).filter((r): r is string => r !== null);
     return [...new Set(parsed)].slice(0, MAX_REPOS);
   }, [params]);
+  const tour = params.get("tour") === "1";
 
   const [repos, setRepos] = useState<Knowledge[]>([]);
   const [loadStep, setLoadStep] = useState("Opening my notes");
@@ -115,7 +117,7 @@ export default function Talk() {
 
   return (
     <RoomContext.Provider value={room}>
-      <Session room={room} repos={repos} setRepos={setRepos} />
+      <Session room={room} repos={repos} setRepos={setRepos} tour={tour} />
       <RoomAudioRenderer />
     </RoomContext.Provider>
   );
@@ -125,11 +127,15 @@ function Session({
   room,
   repos,
   setRepos,
+  tour,
 }: {
   room: Room;
   repos: Knowledge[];
   setRepos: React.Dispatch<React.SetStateAction<Knowledge[]>>;
+  /** Start with the first-time guided tour open. */
+  tour: boolean;
 }) {
+  const [touring, setTouring] = useState(tour);
   const [phase, setPhase] = useState<Phase>("idle");
   const [error, setError] = useState("");
   const [slow, setSlow] = useState(false);
@@ -375,6 +381,9 @@ function Session({
           {error && <p className="form-error small" role="alert">{error}</p>}
         </section>
 
+        {touring ? (
+          <Tour ask={ask} start={() => void connect()} inSession={phase === "connecting" || phase === "live"} onExit={() => setTouring(false)} />
+        ) : (
         <section className="tile grow">
           <h2 className="tile-title">Try asking</h2>
           <div className="tile-body chips-col">
@@ -383,8 +392,10 @@ function Session({
             ))}
             <button className="chip q" onClick={() => ask("Who are the most active contributors, and how active is this project?")}>Who is most active here?</button>
             <button className="chip q" onClick={() => ask("What changed most recently in this project?")}>What changed recently?</button>
+            {tour && <button className="link-btn tour-again" onClick={() => setTouring(true)}>Back to the guided tour</button>}
           </div>
         </section>
+        )}
       </aside>
 
       {/* ---------- Code + conversation ---------- */}

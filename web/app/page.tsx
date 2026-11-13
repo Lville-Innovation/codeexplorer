@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { learn, timeAgo } from "@/lib/client";
 import { parseRepoLoose, repoIdOf } from "@/lib/parse";
+import { TUTORIAL_HREF } from "@/lib/tutorial";
 import { MAX_REPOS, type RecentRepo } from "@/lib/types";
 
 const EXAMPLES = ["pallets/flask", "expressjs/express", "psf/requests"];
@@ -125,6 +126,13 @@ export default function Home() {
             Paste a link to any public project on GitHub or GitLab. Pixel reads all the code, then you can talk out loud
             and ask anything. No coding experience needed.
           </p>
+
+          <div className="card tour-card">
+            <div>
+              <strong>First time here?</strong> Take the 5-minute guided tour with a sample project.
+            </div>
+            <a className="btn" href={TUTORIAL_HREF}>Start the tour</a>
+          </div>
 
           <form className="card form" onSubmit={start}>
             <label className="form-label" htmlFor="repo-0">

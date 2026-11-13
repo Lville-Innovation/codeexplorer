@@ -14,6 +14,10 @@ It is built for high school students and other people who are not engineers.
 - Knows who contributes to a project and how active it has been.
 - Suggests questions to ask.
 
+## New here?
+
+Take the 5-minute guided tour: press **Start the tour** on the home page, or read [docs/TUTORIAL.md](docs/TUTORIAL.md). It walks through a sample project with guiding questions.
+
 ## How it is put together
 
 | Folder | What it is |

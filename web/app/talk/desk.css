@@ -102,3 +102,23 @@
   .pixel-tile .stage { max-width: 190px; margin: 0 auto 4px; width: 100%; }
   .code-split { grid-template-columns: 1fr; grid-template-rows: 130px 1fr; }
 }
+
+/* ---------- guided tour ---------- */
+.tour { border-color: var(--red); }
+.tour-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.tour-count { font-size: 0.8rem; font-weight: 700; color: var(--ink-soft); white-space: nowrap; }
+.tour-dots { display: flex; gap: 4px; }
+.tour-dot { flex: 1; height: 6px; border-radius: 99px; background: var(--red-soft); }
+.tour-dot.done { background: var(--ok); }
+.tour-dot.on { background: var(--red); }
+.tour-body { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; font-size: 0.92rem; line-height: 1.4; }
+.tour-body h3 { margin: 2px 0 0; font-size: 1.1rem; }
+.tour-body p { margin: 0; }
+.tour-body .btn { text-align: left; }
+.tour-do { background: var(--red-tint); border-left: 4px solid var(--red); border-radius: 8px; padding: 7px 10px; }
+.tour-ok { color: var(--ok); font-weight: 700; }
+.tour-notice { background: #fff6da; border-left: 4px solid var(--sun); border-radius: 8px; padding: 7px 10px; font-size: 0.86rem; }
+.tour-finish { display: flex; flex-wrap: wrap; gap: 8px; }
+.tour-nav { display: flex; align-items: center; gap: 8px; }
+.tour-skip { margin-left: auto; font-size: 0.85rem; }
+.tour-again { align-self: flex-start; font-size: 0.85rem; }
