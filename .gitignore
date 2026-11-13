@@ -1,0 +1,11 @@
+env.txt
+.env
+.env.*
+!.env.example
+node_modules/
+.next/
+.vercel/
+dist/
+*.log
+# Created by `lk agent create`; holds your own LiveKit project and agent ids.
+agent/livekit.toml
