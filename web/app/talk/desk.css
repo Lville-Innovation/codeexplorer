@@ -143,3 +143,7 @@
   .tour-step { width: 56px; height: 56px; }
   .tour-step strong { font-size: 1.5rem; }
 }
+
+/* Always-visible link to the project or file on its host. */
+.bar-link { margin-left: auto; flex: none; text-decoration: none; color: var(--red-dark); background: var(--red-tint); border: 2px solid var(--red-soft); border-radius: 999px; padding: 3px 12px; }
+.bar-link:hover { border-color: var(--red); background: var(--red-soft); }

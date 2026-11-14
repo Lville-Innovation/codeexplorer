@@ -435,6 +435,9 @@ function Session({
                 ))}
               </div>
             )}
+            <a href={view ? view.url : k.url} target="_blank" rel="noreferrer" className="code-link bar-link" title={view ? `Open ${view.path} on ${hostName(k.host)}` : `Open this project on ${hostName(k.host)}`}>
+              Open {view ? "this file" : "project"} on {view ? (view.url.startsWith("https://gitlab.com/") ? "GitLab" : "GitHub") : hostName(k.host)} ↗
+            </a>
           </div>
           <div className="code-split">
             <nav className="explorer" aria-label="Files in this project">
@@ -601,7 +604,6 @@ function CodePane({ view }: { view: CodeView }) {
           ))}
           <strong>{file}</strong>
         </span>
-        <a href={view.url} target="_blank" rel="noreferrer" className="code-link">Open on {site} ↗</a>
       </div>
       {view.caption && (
         <p className="code-caption">
